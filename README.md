@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Password Generator
 
-## Getting Started
+A lightweight, client-side password generator built with Next.js, TypeScript, and Tailwind CSS. Passwords are generated entirely in the browser — nothing is stored or sent to a server.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Random secure passwords using `crypto.getRandomValues`
+- Adjustable length (4–64, default 8) via slider and number input
+- Character type checkboxes: uppercase, lowercase, numbers, symbols
+- At least one character type required; warning shown and generate disabled when none selected
+- Copy to clipboard
+- Password strength indicator (weak → strong)
+- Responsive, minimal UI with dark mode support
+
+## Project structure
+
+```
+password-generator/
+├── app/
+│   ├── globals.css          # Tailwind + theme variables
+│   ├── layout.tsx           # Root layout and metadata
+│   └── page.tsx             # Home page
+├── components/
+│   └── PasswordGenerator.tsx # Main UI (client component)
+├── lib/
+│   ├── constants.ts         # Length limits and character sets
+│   ├── password.ts          # Generation logic
+│   ├── strength.ts          # Strength scoring
+│   └── types.ts             # Shared TypeScript types
+└── public/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup (pnpm)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Dependencies are already included in the scaffold. Install and run:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm install
+pnpm dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+### Production build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm build
+pnpm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Implementation notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Arrow functions only**: All functions use `const name = () => {}` syntax (components, handlers, utilities).
+- **Checkbox logic**: `hasSelection` is derived from options state. The generate button is `disabled` when no type is selected, and an alert explains why.
+- **Secure randomness**: `generatePassword` uses `crypto.getRandomValues` and Fisher–Yates shuffle. Each selected character set contributes at least one character when possible.
+- **No backend**: The app is a single client component with no API routes or persistence.
