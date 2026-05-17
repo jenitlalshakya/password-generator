@@ -8,7 +8,7 @@ export const CHARSET = {
   uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   lowercase: "abcdefghijklmnopqrstuvwxyz",
   numbers: "0123456789",
-  symbols: "!@#$%^&*()_+-=[]{}|;:,.<>?",
+  symbols: "!@#$%^&*_-+=",
 } as const;
 
 export type CharacterOptionKey = keyof typeof CHARSET;

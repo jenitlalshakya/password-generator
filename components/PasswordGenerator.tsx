@@ -40,7 +40,7 @@ const CHARACTER_LABELS: {
   {
     key: "symbols",
     label: "Symbols",
-    description: "!@#$%^&* etc.",
+    description: "!@#$%^&*_-+=",
   },
 ];
 
