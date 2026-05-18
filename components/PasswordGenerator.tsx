@@ -198,9 +198,9 @@ export const PasswordGenerator = () => {
               >
                 Include characters
               </h2>
-              <ul className="space-y-2">
+              <ul className="grid grid-cols-2 gap-2">
                 {CHARACTER_LABELS.map(({ key, label, description }) => (
-                  <li key={key}>
+                  <li key={key} className="min-w-0">
                     <label className="group flex cursor-pointer items-start gap-3 rounded-xl border border-transparent px-3 py-2.5 transition-colors duration-200 hover:border-zinc-200 hover:bg-zinc-50 dark:hover:border-zinc-800 dark:hover:bg-zinc-900/80">
                       <input
                         type="checkbox"
