@@ -1,6 +1,12 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import {
+  HiCheck,
+  HiDocumentDuplicate,
+  HiEye,
+  HiEyeSlash,
+} from "react-icons/hi2";
 import { CHARSET, PASSWORD_LENGTH } from "@/lib/constants";
 import {
   clampLength,
@@ -10,6 +16,10 @@ import {
   resolveLengthFromInput,
 } from "@/lib/length";
 import { generatePassword } from "@/lib/password";
+import {
+  getBruteForceEstimate,
+  OFFLINE_GUESSES_PER_SECOND_LABEL,
+} from "@/lib/crack-estimate";
 import {
   calculateStrength,
   getStrengthMeta,
@@ -57,6 +67,7 @@ export const PasswordGenerator = () => {
   });
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
   const hasSelection = useMemo(
     () => Object.values(options).some(Boolean),
     [options],
@@ -69,6 +80,10 @@ export const PasswordGenerator = () => {
 
   const strengthMeta = getStrengthMeta(strength);
   const strengthPercent = strengthToPercent(strength);
+  const bruteForceEstimate = useMemo(
+    () => getBruteForceEstimate(password, options),
+    [password, options],
+  );
   const sliderValue = getSliderValue(lengthInput, length);
   const displayLength = sliderValue;
 
@@ -130,7 +145,7 @@ export const PasswordGenerator = () => {
     try {
       await navigator.clipboard.writeText(password);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 1000);
     } catch {
       setCopied(false);
     }
@@ -232,6 +247,7 @@ export const PasswordGenerator = () => {
             )}
 
             <button
+              id="generate-password-btn"
               type="button"
               onClick={handleGenerate}
               disabled={!hasSelection}
@@ -245,13 +261,53 @@ export const PasswordGenerator = () => {
                 Generated password
               </h2>
               <output
-                htmlFor="generate-actions"
-                className="block min-h-[3.25rem] w-full break-all rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 font-mono text-sm leading-relaxed text-zinc-900 transition-colors duration-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                htmlFor="generate-password-btn"
+                className="flex min-h-13 w-full items-start gap-1 rounded-xl border border-zinc-200 bg-zinc-50 py-2 pl-4 pr-2 transition-colors duration-200 dark:border-zinc-700 dark:bg-zinc-900"
               >
-                {password || (
-                  <span className="text-zinc-400 dark:text-zinc-500">
-                    Your password will appear here
-                  </span>
+                <span
+                  className={`min-w-0 flex-1 break-all py-1 font-mono text-sm leading-relaxed text-zinc-900 dark:text-zinc-100 ${
+                    password && !showPassword ? "[-webkit-text-security:disc]" : ""
+                  }`}
+                >
+                  {password || (
+                    <span className="font-sans text-zinc-400 dark:text-zinc-500">
+                      Your password will appear here
+                    </span>
+                  )}
+                </span>
+                {password && (
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="rounded-lg p-2 text-zinc-500 transition-colors duration-200 hover:bg-zinc-200/80 hover:text-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      aria-pressed={showPassword}
+                    >
+                      {showPassword ? (
+                        <HiEyeSlash className="size-5" aria-hidden />
+                      ) : (
+                        <HiEye className="size-5" aria-hidden />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCopy}
+                      className="rounded-lg p-2 text-zinc-500 transition-colors duration-200 hover:bg-zinc-200/80 hover:text-violet-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 dark:hover:bg-zinc-800 dark:hover:text-violet-300"
+                      aria-label={copied ? "Copied" : "Copy password"}
+                    >
+                      {copied ? (
+                        <HiCheck
+                          className="size-5 text-emerald-600 dark:text-emerald-400"
+                          aria-hidden
+                        />
+                      ) : (
+                        <HiDocumentDuplicate className="size-5" aria-hidden />
+                      )}
+                    </button>
+                  </div>
                 )}
               </output>
 
@@ -271,19 +327,40 @@ export const PasswordGenerator = () => {
                       style={{ width: `${strengthPercent}%` }}
                     />
                   </div>
+
+                  <aside
+                    aria-label="Password security notes"
+                    className="mt-3 space-y-2.5 rounded-xl border border-zinc-200/80 bg-zinc-50/80 px-3 py-3 text-xs leading-relaxed text-zinc-600 dark:border-zinc-700/80 dark:bg-zinc-900/50 dark:text-zinc-400 sm:px-3.5"
+                  >
+                    <p>
+                      <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                        Brute-force estimate:{" "}
+                      </span>
+                      About{" "}
+                      <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                        {bruteForceEstimate.duration}
+                      </span>{" "}
+                      to try half of all combinations offline (
+                      {bruteForceEstimate.charsetSize} possible characters,{" "}
+                      {OFFLINE_GUESSES_PER_SECOND_LABEL}).
+                    </p>
+                    <p>
+                      <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                        How long to keep it:{" "}
+                      </span>
+                      A strong, unique password does not need a fixed expiry —
+                      keep it until a breach, phishing attempt, or account
+                      compromise. Change critical accounts (email, banking,
+                      work) about every{" "}
+                      <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                        12–18 months
+                      </span>{" "}
+                      if your policy allows, or sooner if a service notifies
+                      you.
+                    </p>
+                  </aside>
                 </div>
               )}
-
-              <div id="generate-actions" className="mt-3">
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  disabled={!password}
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-800 transition-all duration-200 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-violet-700 dark:hover:bg-violet-950/40 dark:hover:text-violet-300"
-                >
-                  {copied ? "Copied!" : "Copy to clipboard"}
-                </button>
-              </div>
             </section>
           </div>
         </div>
