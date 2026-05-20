@@ -65,6 +65,7 @@ export const PasswordGenerator = () => {
     numbers: true,
     symbols: false,
   });
+  const [analysisOptions, setAnalysisOptions] = useState<CharacterOptions | null>(null);
   const [password, setPassword] = useState("");
   const [copied, setCopied] = useState(false);
   const [showPassword, setShowPassword] = useState(true);
@@ -73,16 +74,17 @@ export const PasswordGenerator = () => {
     [options],
   );
 
+  const effectiveAnalysisOptions = analysisOptions ?? options;
   const strength = useMemo(
-    () => calculateStrength(password, options),
-    [password, options],
+    () => calculateStrength(password, effectiveAnalysisOptions),
+    [password, effectiveAnalysisOptions],
   );
 
   const strengthMeta = getStrengthMeta(strength);
   const strengthPercent = strengthToPercent(strength);
   const bruteForceEstimate = useMemo(
-    () => getBruteForceEstimate(password, options),
-    [password, options],
+    () => getBruteForceEstimate(password, effectiveAnalysisOptions),
+    [password, effectiveAnalysisOptions],
   );
   const sliderValue = getSliderValue(lengthInput, length);
   const displayLength = sliderValue;
@@ -137,6 +139,7 @@ export const PasswordGenerator = () => {
     const resolved = resolveLengthFromInput(lengthInput, length);
     applyValidatedLength(resolved);
     setPassword(generatePassword(resolved, options));
+    setAnalysisOptions({ ...options });
     setCopied(false);
   }, [hasSelection, lengthInput, length, options, applyValidatedLength]);
 
