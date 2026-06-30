@@ -189,20 +189,17 @@ export const PasswordGenerator = () => {
                 className="h-2 w-full cursor-pointer appearance-none rounded-full bg-zinc-200 accent-violet-600 transition-[accent-color] duration-200 dark:bg-zinc-800"
               />
               <div className="mt-3 flex items-center gap-3">
-                  <input
-                    id="length-input"
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="off"
-                    aria-valuemin={PASSWORD_LENGTH.min}
-                    aria-valuemax={PASSWORD_LENGTH.max}
-                    aria-valuenow={sliderValue}
-                    value={lengthInput}
-                    onChange={handleLengthInputChange}
-                    onBlur={handleLengthInputBlur}
-                    onKeyDown={handleLengthInputKeyDown}
-                    className="w-20 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-sm tabular-nums text-zinc-900 outline-none transition-colors duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-                  />
+                <input
+                  id="length-input"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  value={lengthInput}
+                  onChange={handleLengthInputChange}
+                  onBlur={handleLengthInputBlur}
+                  onKeyDown={handleLengthInputKeyDown}
+                  className="w-20 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-sm tabular-nums text-zinc-900 outline-none transition-colors duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                />
                 <span className="text-xs text-zinc-500 dark:text-zinc-400">
                   {PASSWORD_LENGTH.min}–{PASSWORD_LENGTH.max} characters
                 </span>
